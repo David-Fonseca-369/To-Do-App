@@ -1,8 +1,85 @@
-<h1>To Do App</h1>
+<app-menu></app-menu>
 
-<input type="text" #newNote>
-<button (click)="addNotes(newNote.value)">Add note</button>
-<h3 *ngFor="let note of notes">
-  <b>{{note.description}}</b>
-  <button (click)="deleteNotes(note.id)">Delete</button>
-</h3>
+<div class="container">
+  <h2>My To Do List</h2>
+  <p style="margin-top: -1.5rem; color: gray; margin-bottom: 3rem;">{{ today | date : "EEEE, MMMM d" }}</p>
+
+
+  <form [formGroup]="form" (submit)="addNotes(newNote.value)">
+    <mat-form-field appearance="outline" floatLabel="always">
+      <mat-label>Task</mat-label>
+      <input
+        matInput
+        type="text"
+        #newNote
+        formControlName="task"
+        placeholder="Write your task..."
+      />
+      <mat-icon matSuffix>post_add</mat-icon>
+    </mat-form-field>
+
+    <button
+      style="margin-left: 1rem"
+      mat-flat-button
+      color="primary"
+      [disabled]="form.invalid"
+    >
+      Add Task
+    </button>
+  </form>
+  <div class="card" *ngFor="let task of pendingTasks; let index = index">
+    <div
+      style="display: flex; justify-content: space-between; align-items: center"
+    >
+      <div style="margin-left: 1rem; display: flex; align-items: center">
+        <div style="margin-right: 1rem">
+          <mat-checkbox
+            (change)="completeTask($event.checked, task.id)"
+          ></mat-checkbox>
+        </div>
+
+        <div>
+          <p>{{ task.description }}</p>
+          <p style="font-size: small; color: grey; margin-top: -1rem">
+            Task {{ index + 1 }}
+          </p>
+        </div>
+      </div>
+
+      <button mat-icon-button (click)="deleteNotes(task.id)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </div>
+  <ng-container *ngIf="completedTasks.length > 0">
+    <div class="accordion">
+      <mat-accordion>
+        <mat-expansion-panel
+          (opened)="panelOpenState = true"
+          (closed)="panelOpenState = false"
+        >
+          <mat-expansion-panel-header>
+            <mat-panel-title
+              >Completed
+              <span style="color: gray; margin-left: 1rem">{{
+                completedTasks.length
+              }}</span></mat-panel-title
+            >
+          </mat-expansion-panel-header>
+          <!-- contenido -->
+          <div *ngFor="let completedTask of completedTasks">
+            <p>
+              <del>{{ completedTask.description }}</del>
+            </p>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end">
+            <button mat-button (click)="deleteCompletedTasks()">
+              <mat-icon>delete</mat-icon>Clear All
+            </button>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+  </ng-container>
+</div>
